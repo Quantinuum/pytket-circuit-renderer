@@ -35,7 +35,7 @@
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
     "@cypress/vue": "^7.0.0",
-    "@cypress/webpack-dev-server": "^2.0.0",
+    "@cypress/webpack-dev-server": "^6.0.0",
     "@storybook/addon-actions": "^8.0.4",
     "@storybook/addon-essentials": "^8.0.4",
     "@storybook/addon-interactions": "^8.0.4",
