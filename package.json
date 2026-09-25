@@ -47,7 +47,7 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "^5.0.8",
-    "babel-loader": "^8.2.5",
+    "babel-loader": "^10.1.1",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
     "cypress": "^13.7.1",
