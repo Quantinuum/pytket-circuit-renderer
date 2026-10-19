@@ -57,7 +57,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.2.4",
     "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-vue": "^9.3.0",
+    "eslint-plugin-vue": "^10.11.1",
     "jpeg-js": "^0.4.4",
     "path-browserify": "^1.0.1",
     "peggy": "^4.0.3",
