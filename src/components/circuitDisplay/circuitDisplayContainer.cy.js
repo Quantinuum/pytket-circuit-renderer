@@ -3,7 +3,6 @@ import { composeStories } from '@storybook/vue3'
 import * as stories from './circuitDisplayContainer.stories.js'
 import { PNG } from 'pngjs'
 import jpeg from 'jpeg-js'
-import pixelmatch from 'pixelmatch'
 
 const components = composeStories(stories)
 const useCases = Object.keys(components)
@@ -127,7 +126,8 @@ describe('Circuit display container component', () => {
             cy.get('[title="Display Options"]').click()
             cy.get('[data-cy="resetZoom"]').click()
 
-            cy.get('[title="Export"').click()
+            captureCircuitDimensions()
+            cy.get('[title="Export"]').click()
             cy.contains('Export circuit as an image')
 
             cy.get(`[data-cy="option-${fileType.toUpperCase()}"]`).click()
@@ -137,7 +137,7 @@ describe('Circuit display container component', () => {
             const circuitName = `cy-BASIC-x${resolution}`
             cy.get('input[data-cy="filename"]').clear().type(circuitName)
 
-            compareImages(circuitName, fileType)
+            checkExport(circuitName, fileType, resolution)
           })
           // Only check multiple for png
           if (fileType === 'png') {
@@ -151,7 +151,8 @@ describe('Circuit display container component', () => {
               cy.contains('Dark Mode').click()
               cy.get('[title="Display Options"]').click()
 
-              cy.get('[title="Export"').click()
+              captureCircuitDimensions()
+              cy.get('[title="Export"]').click()
               cy.contains('Export circuit as an image')
 
               cy.get(`[data-cy="option-${fileType.toUpperCase()}"]`).click()
@@ -162,8 +163,8 @@ describe('Circuit display container component', () => {
               cy.get('input[data-cy="filename"]').clear().type(circuitName)
               cy.get('[data-cy="number_images"]').click()
 
-              compareImages(circuitName + '0', fileType)
-              compareImages(circuitName + '1', fileType)
+              checkExport(circuitName + '0', fileType, resolution, 0)
+              checkExport(circuitName + '1', fileType, resolution, 1)
             })
           }
         })
@@ -172,47 +173,59 @@ describe('Circuit display container component', () => {
   })
 })
 
-async function decodeImage (base64, filetype) {
-  const buff = Cypress.Buffer.from(base64, 'base64')
-  if (filetype === 'png') {
-    return PNG.sync.read(buff)
-  } else if (filetype === 'jpeg') {
-    return jpeg.decode(buff)
-  }
+// Measure the rendered circuits rather than depending on a runner's installed fonts.
+function captureCircuitDimensions () {
+  cy.get('.circuit-inner-scroll').then($circuits => {
+    const dimensions = [...$circuits].map(circuit => ({
+      width: circuit.clientWidth,
+      height: circuit.clientHeight
+    }))
+    cy.wrap(dimensions).as('circuitDimensions')
+  })
 }
 
-function compareImages (circuitName, fileType) {
+function checkExport (circuitName, fileType, resolution, index = 0) {
   const actualFilename = `${circuitName}.${fileType}`
-  const expectedScreenshotFilename = `${circuitName}.${fileType}.SCREENSHOT-REF.png`
+  const mimeType = fileType === 'svg' ? 'image/svg+xml' : `image/${fileType}`
 
   cy.get(`img[data-cy="${actualFilename}"]`)
-    .scrollIntoView()
-    .screenshot(actualFilename)
-    .then(($image) => {
-      cy.get(`button[data-cy="${actualFilename}"]`).click()
-
-      // Check that a file is downloaded
-      cy.readFile('cypress/downloads/' + actualFilename, 'base64', {})
-
-      // Compare image preview screenshot to reference image
-      cy.readFile('cypress/fixtures/images/' + expectedScreenshotFilename, 'base64', {})
-        .then((expectedFile) => {
-          // Check the screenshot of the image preview.
-          cy.readFile(`${Cypress.config('screenshotsFolder')}/circuitDisplayContainer.cy.js/${actualFilename}.png`, 'base64', {})
-            .then(async (actualScreenshot) => {
-              const actualImage = await decodeImage(actualScreenshot, 'png')
-              const expectedImage = await decodeImage(expectedFile, 'png')
-              expect(actualImage.width).equal(expectedImage.width)
-              expect(actualImage.height).equal(expectedImage.height)
-              const diff = await pixelmatch(
-                actualImage.data,
-                expectedImage.data,
-                null,
-                actualImage.width,
-                actualImage.height,
-                { threshold: 0.05 }
-              )
-              expect(diff).equal(0)
+    .should($image => {
+      expect($image[0].complete, 'preview loaded').equal(true)
+      expect($image[0].naturalWidth, 'preview width').greaterThan(0)
+      expect($image[0].src.split(/[;,]/)[0], 'export format').equal(`data:${mimeType}`)
+    })
+    .then($image => {
+      const image = $image[0]
+      cy.get('@circuitDimensions').then(dimensions => {
+        const expectedWidth = Math.ceil(dimensions[index].width * resolution)
+        const expectedHeight = Math.ceil(dimensions[index].height * resolution)
+        expect(image.naturalWidth, 'exported width').equal(expectedWidth)
+        expect(image.naturalHeight, 'exported height').equal(expectedHeight)
+      })
+      // Fetch also decodes SVG data URLs without depending on their escaping.
+      cy.wrap(image.ownerDocument.defaultView.fetch(image.src)
+        .then(response => response.arrayBuffer())
+        .then(buffer => Cypress.Buffer.from(new Uint8Array(buffer)).toString('base64')))
+        .then(preview => {
+          cy.get(`button[data-cy="${actualFilename}"]`).click()
+          cy.readFile(`${Cypress.config('downloadsFolder')}/${actualFilename}`, 'base64')
+            .should('be.a', 'string')
+            .then(download => {
+              expect(download === preview, 'download matches preview bytes').equal(true)
+              if (fileType === 'svg') {
+                const xml = new image.ownerDocument.defaultView.DOMParser()
+                  .parseFromString(Cypress.Buffer.from(download, 'base64').toString('utf8'), 'image/svg+xml')
+                expect(xml.querySelector('parsererror'), 'valid SVG').equal(null)
+                expect(xml.documentElement.localName).equal('svg')
+                expect(xml.documentElement.getAttribute('width')).equal(String(image.naturalWidth))
+                expect(xml.documentElement.getAttribute('height')).equal(String(image.naturalHeight))
+                expect(xml.querySelector('foreignObject .circuit-container'), 'exported circuit').not.equal(null)
+              } else {
+                const buffer = Cypress.Buffer.from(download, 'base64')
+                const decoded = fileType === 'png' ? PNG.sync.read(buffer) : jpeg.decode(buffer)
+                expect(decoded.width, 'downloaded width').equal(image.naturalWidth)
+                expect(decoded.height, 'downloaded height').equal(image.naturalHeight)
+              }
             })
         })
     })
