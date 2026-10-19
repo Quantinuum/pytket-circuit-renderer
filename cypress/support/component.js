@@ -1,6 +1,6 @@
 /* global Cypress */
 import './commands'
-import { mount } from 'cypress/vue'
+import { mount } from '@cypress/vue'
 import 'vue/dist/vue.esm-bundler.js' // Required for mounting storybook components
 import * as globalStorybookConfig from '../../.storybook/preview' // path of your preview.js file
 import { setProjectAnnotations } from '@storybook/vue3'

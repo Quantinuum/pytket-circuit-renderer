@@ -1,10 +1,8 @@
 const { defineConfig } = require('@vue/cli-service')
 
 module.exports = defineConfig({
-  transpileDependencies: true
-})
-
-module.exports = {
+  // Thread workers cannot read the virtual modules used by Storybook and Cypress.
+  parallel: false,
   chainWebpack: config => {
     config.module
       .rule('vue')
@@ -17,4 +15,4 @@ module.exports = {
         return options
       })
   }
-}
+})

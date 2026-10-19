@@ -73,7 +73,9 @@ Check the example folder for a basic sample app that uses this component.
 
 
 ## Development
-To get started with the project locally, first install the npm dependencies via `npm install`.
+Use Node.js 22 for development, then install the npm dependencies via `npm install`.
+
+The dependency overrides in `package.json` keep transitive dependencies on patched versions while the Vue CLI and Storybook dependency ranges lag behind. Keep these overrides when refreshing the lockfile, and check the library build, Storybook build, and Cypress tests when changing them.
 
 ### Test
 You should then be able to run storybook to manually inspect the components via `npm run storybook`.

@@ -7,6 +7,10 @@ module.exports = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, '../src/')
     }
+    // The Vue CLI production CSS rules need their matching extraction plugin.
+    config.plugins.push(...vueBaseConfig.plugins.filter(plugin =>
+      plugin.constructor.name === 'MiniCssExtractPlugin'
+    ))
     return { ...config, module: { ...config.module, rules: vueBaseConfig.module.rules } }
   },
 

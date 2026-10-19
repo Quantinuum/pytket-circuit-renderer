@@ -29,8 +29,7 @@ export default {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize)
       // Init tracking the current size of the modal
-      this.modalWidth = this.$refs.modal.clientWidth
-      this.modalHeight = this.$refs.modal.clientHeight
+      this.onResize()
     })
   },
   updated () {
@@ -46,8 +45,12 @@ export default {
     onResize () {
       this.height = window.innerHeight
       this.width = window.innerWidth
-      this.modalWidth = this.$refs.modal.clientWidth
-      this.modalHeight = this.$refs.modal.clientHeight
+      const modal = this.$refs.modal
+      // The ref can be cleared while the modal moves between teleport targets.
+      if (modal) {
+        this.modalWidth = modal.clientWidth
+        this.modalHeight = modal.clientHeight
+      }
     }
   }
 }
