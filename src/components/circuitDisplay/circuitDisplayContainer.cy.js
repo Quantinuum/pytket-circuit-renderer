@@ -198,7 +198,7 @@ function compareImages (circuitName, fileType) {
       cy.readFile('cypress/fixtures/images/' + expectedScreenshotFilename, 'base64', {})
         .then((expectedFile) => {
           // Check the screenshot of the image preview.
-          cy.readFile(`cypress/screenshots/circuitDisplayContainer.cy.js/${actualFilename}.png`, 'base64', {})
+          cy.readFile(`${Cypress.config('screenshotsFolder')}/circuitDisplayContainer.cy.js/${actualFilename}.png`, 'base64', {})
             .then(async (actualScreenshot) => {
               const actualImage = await decodeImage(actualScreenshot, 'png')
               const expectedImage = await decodeImage(expectedFile, 'png')

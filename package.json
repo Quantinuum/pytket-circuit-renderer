@@ -29,13 +29,13 @@
   "dependencies": {
     "dom-to-image": "^2.6.0",
     "mathjs": "^11.6.0",
-    "vue": "^3.2.39"
+    "vue": "^3.5.42"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
     "@cypress/vue": "^7.0.0",
-    "@cypress/webpack-dev-server": "^2.0.0",
+    "@cypress/webpack-dev-server": "^4.1.1",
     "@storybook/addon-actions": "^8.0.4",
     "@storybook/addon-essentials": "^8.0.4",
     "@storybook/addon-interactions": "^8.0.4",
@@ -47,10 +47,11 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "^5.0.8",
+    "assert": "^2.1.0",
     "babel-loader": "^10.1.1",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
-    "cypress": "^13.7.1",
+    "cypress": "^16.2.0",
     "eslint": "^8.22.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
@@ -58,16 +59,16 @@
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-vue": "^9.3.0",
     "jpeg-js": "^0.4.4",
-    "node-sass": "^9.0.0",
     "path-browserify": "^1.0.1",
     "peggy": "^4.0.3",
     "pixelmatch": "^6.0.0",
+    "pngjs": "^7.0.0",
     "sass": "^1.56.0",
     "sass-loader": "^10.3.1",
     "serve": "^14.2.4",
     "storybook": "^8.0.4",
     "stream-browserify": "^3.0.0",
-    "vue-loader": "^16.8.3",
+    "vue-loader": "^17.4.2",
     "webpack": "^5.96.1"
   },
   "eslintConfig": {
@@ -89,5 +90,16 @@
     "last 2 versions",
     "not dead",
     "not ie 11"
-  ]
+  ],
+  "overrides": {
+    "webpack-dev-server": "^5.2.7",
+    "webpack-dev-middleware": "^7.4.6",
+    "postcss": "^8.5.28",
+    "postcss-selector-parser": "^7.1.6",
+    "serialize-javascript": "^7.1.2",
+    "uuid": "^11.1.1",
+    "micromatch": "^4.0.8",
+    "cross-spawn": "^7.0.6",
+    "compression": "^1.8.2"
+  }
 }
