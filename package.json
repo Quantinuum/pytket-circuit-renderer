@@ -39,7 +39,7 @@
     "@storybook/addon-actions": "^8.0.4",
     "@storybook/addon-essentials": "^8.0.4",
     "@storybook/addon-interactions": "^8.0.4",
-    "@storybook/addon-links": "^8.0.4",
+    "@storybook/addon-links": "^10.6.2",
     "@storybook/addon-webpack5-compiler-babel": "^3.0.3",
     "@storybook/test": "^8.0.4",
     "@storybook/vue3": "^8.0.4",
